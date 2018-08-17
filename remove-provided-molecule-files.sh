@@ -14,6 +14,8 @@ mkdir --parents '.tmp'
 
 repos=($(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/users/gantsign/repos \
         | jq --raw-output '.[] | select(.archived == false) | .name | select(. | test("ansible-role-.*"))'))
+repos+=($(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/users/gantsign/repos \
+        | jq --raw-output '.[] | select(.archived == false) | .name | select(. | test("ansible_role_.*"))'))
 
 commit_msg="\
 Removed unnecessary Molecule files
