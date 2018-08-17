@@ -28,8 +28,8 @@ branch_name="rm-molecule-files"
 changed_file='create.yml'
 
 update_files() {
-    (set -x && git rm \
-        $(find . -regextype posix-extended -regex '.*/(prepare|create|destroy).yml'))
+    (set -x && find . -regextype posix-extended -regex '.*/(prepare|create|destroy).yml' \
+         -exec git rm {} \;)
 
     (set -x && find . -name 'molecule.yml' -exec \
         sed --in-place --regexp-extended '/(prepare|create|destroy).yml/d' {} \;)
