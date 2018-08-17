@@ -87,3 +87,5 @@ process_repo() {
 for repo in "${repos[@]}"; do
     (cd '.tmp' && process_repo "$repo")
 done
+
+print_banner "Finished"
