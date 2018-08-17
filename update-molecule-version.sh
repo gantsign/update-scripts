@@ -6,8 +6,6 @@ new_version='2.16.0'
 
 hub_download_url=$(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/github/hub/releases \
         | jq --raw-output '.[0].assets[] | select(.name | test("hub-linux-amd64-[0-9.]+.tgz")) | .browser_download_url')
-repos+=($(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/users/gantsign/repos \
-        | jq --raw-output '.[] | select(.archived == false) | .name | select(. | test("ansible_role_.*"))'))
 
 mkdir --parents '.tmp'
 
@@ -15,6 +13,8 @@ mkdir --parents '.tmp'
 
 repos=($(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/users/gantsign/repos \
         | jq --raw-output '.[] | select(.archived == false) | .name | select(. | test("ansible-role-.*"))'))
+repos+=($(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/users/gantsign/repos \
+        | jq --raw-output '.[] | select(.archived == false) | .name | select(. | test("ansible_role_.*"))'))
 
 commit_msg="\
 Updated Molecule to $new_version
