@@ -31,7 +31,7 @@ update_files() {
     if [[ ${#versions[@]} == 2 ]]; then
         min_version=${versions[0]}
 
-        if [[ $min_version != 2.6.* ]]; then
+        if [[ $min_version != 2.4.* ]]; then
             (set -x && perl -i -pe \
                 "s/ANSIBLE_VERSION=\Q$min_version\E/ANSIBLE_VERSION=$new_version/" .travis.yml)
 
