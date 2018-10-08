@@ -2,7 +2,7 @@
 
 set -e
 
-new_version='2.6.3'
+new_version='2.7.0'
 
 hub_download_url=$(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/github/hub/releases \
         | jq --raw-output '.[0].assets[] | select(.name | test("hub-linux-amd64-[0-9.]+.tgz")) | .browser_download_url')
@@ -15,9 +15,9 @@ repos=($(curl --silent -H 'Accept: application/vnd.github.v3+json' 'https://api.
         | jq --raw-output '.[] | select(.archived == false) | .name | select(. | test("ansible.role.*"))'))
 
 commit_msg="\
-Increased upper Ansible test range to Ansible 2.6
+Increased upper Ansible test range to Ansible 2.7
 
-Ensure this role works with Ansible 2.6.
+Ensure this role works with Ansible 2.7.
 "
 
 branch_name="ansible-$new_version"
@@ -25,13 +25,14 @@ branch_name="ansible-$new_version"
 changed_file='.travis.yml'
 
 update_files() {
-    versions=($(grep --color=never --only-matching --perl-regexp '(?<=ANSIBLE_VERSION=).*' .travis.yml | sort --version-sort --unique))
+    versions=($(grep --color=never --only-matching --perl-regexp '(?<=MOLECULEW_ANSIBLE=).*' .travis.yml | sort --version-sort --unique))
     if [[ ${#versions[@]} == 2 ]]; then
         max_version=${versions[1]}
 
-        if [[ $max_version != 2.6.* ]]; then
+        if [[ $max_version != 2.7.* ]]; then
             (set -x && perl -i -pe \
-                "s/ANSIBLE_VERSION=\Q$max_version\E/ANSIBLE_VERSION=$new_version/" .travis.yml)
+                "s/MOLECULEW_ANSIBLE=\Q$max_version\E/MOLECULEW_ANSIBLE=$new_version/" .travis.yml)
+            (set -x && ./moleculew wrapper-freeze --ansible $new_version)
         fi
     fi
 }
