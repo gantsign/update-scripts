@@ -2,7 +2,8 @@
 
 set -e
 
-new_version='2.4.6'
+new_version='2.5.10'
+new_minor_version='2.5'
 
 hub_download_url=$(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/github/hub/releases \
         | jq --raw-output '.[0].assets[] | select(.name | test("hub-linux-amd64-[0-9.]+.tgz")) | .browser_download_url')
@@ -15,28 +16,28 @@ repos=($(curl --silent -H 'Accept: application/vnd.github.v3+json' 'https://api.
         | jq --raw-output '.[] | select(.archived == false) | .name | select(. | test("ansible.role.*"))'))
 
 commit_msg="\
-Increased minimum Ansible version to 2.4
+Increased minimum Ansible version to $new_minor_version
 
-Ansible no longer supports version 2.3 and earlier.
+Ansible no longer supports versions earlier than $new_minor_version.
 "
 
-branch_name="min-ansible-2.4"
+branch_name="min-ansible-$new_minor_version"
 
 changed_file='.travis.yml'
 
 update_files() {
-    versions=($(grep --color=never --only-matching --perl-regexp '(?<=ANSIBLE_VERSION=).*' .travis.yml | sort --version-sort --unique))
+    versions=($(grep --color=never --only-matching --perl-regexp '(?<=MOLECULEW_ANSIBLE=).*' .travis.yml | sort --version-sort --unique))
     if [[ ${#versions[@]} == 2 ]]; then
         min_version=${versions[0]}
 
-        if [[ $min_version != 2.4.* ]]; then
+        if [[ $min_version != $new_minor_version.* ]]; then
             (set -x && perl -i -pe \
-                "s/ANSIBLE_VERSION=\Q$min_version\E/ANSIBLE_VERSION=$new_version/" .travis.yml)
+                "s/MOLECULEW_ANSIBLE=\Q$min_version\E/MOLECULEW_ANSIBLE=$new_version/" .travis.yml)
 
             (set -x && sed --in-place \
-                "s/min_ansible_version: .*/min_ansible_version: 2.4/" meta/main.yml)
+                "s/min_ansible_version: .*/min_ansible_version: $new_minor_version/" meta/main.yml)
 
-            (set -x && sed --in-place "s/Ansible >= .*/Ansible >= 2.4/" README.md)
+            (set -x && sed --in-place "s/Ansible >= .*/Ansible >= $new_minor_version/" README.md)
         fi
     fi
 }
