@@ -2,7 +2,8 @@
 
 set -e
 
-new_version='2.16.0'
+new_version="$(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/ansible/molecule/releases \
+        | jq --raw-output '[.[] | select(.prerelease == false)] | .[0].tag_name')"
 
 hub_download_url=$(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/github/hub/releases \
         | jq --raw-output '.[0].assets[] | select(.name | test("hub-linux-amd64-[0-9.]+.tgz")) | .browser_download_url')
@@ -22,15 +23,16 @@ Keeping up with the latest changes.
 
 branch_name="molecule-$new_version"
 
-changed_file='.travis.yml'
+changed_file='.moleculew/molecule_version'
 
 update_files() {
-    (set -x && sed --in-place --regexp-extended \
-        "s/pip install ['\"]?molecule.*/pip install 'molecule==$new_version'/" .travis.yml)
-    (set -x && sed --in-place --regexp-extended \
-        's/# truthy:/truthy:/' .yamllint)
-    (set -x && grep --quiet '\-\-\-' meta/main.yml \
-        || sed --in-place --regexp-extended '1s/(.*)/---\n\1/' meta/main.yml)
+    (set -x && echo "$new_version" > .moleculew/molecule_version)
+    (set -x && ./moleculew init scenario -r "$repo" -s template -d docker)
+    (set -x && find . -name Dockerfile.j2 | grep -v template | \
+        xargs -I % cp molecule/template/Dockerfile.j2 %)
+    (set -x && find . -name INSTALL.rst | grep -v template | \
+        xargs -I % cp molecule/template/INSTALL.rst %)
+    (set -x && rm -rf molecule/template)
 }
 
 print_banner() {
