@@ -2,8 +2,8 @@
 
 set -e
 
-new_version='2.5.10'
-new_minor_version='2.5'
+new_version='2.6.18'
+new_minor_version='2.6'
 
 hub_download_url=$(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/github/hub/releases \
         | jq --raw-output '.[0].assets[] | select(.name | test("hub-linux-amd64-[0-9.]+.tgz")) | .browser_download_url')
