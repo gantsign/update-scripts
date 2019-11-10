@@ -3,7 +3,7 @@
 set -e
 
 new_version="$(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/kubernetes/kops/releases \
-        | jq --raw-output '.[0].tag_name')"
+        | jq --raw-output '[.[] | select(.prerelease == false)] | .[0].tag_name')"
 
 hub_download_url=$(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/github/hub/releases \
         | jq --raw-output '.[0].assets[] | select(.name | test("hub-linux-amd64-[0-9.]+.tgz")) | .browser_download_url')
