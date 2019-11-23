@@ -2,8 +2,8 @@
 
 set -e
 
-old_version='42.2'
-new_version='15.0'
+old_version='15.0'
+new_version='15.1'
 
 hub_download_url=$(curl --silent -H 'Accept: application/vnd.github.v3+json' https://api.github.com/repos/github/hub/releases \
         | jq --raw-output '.[0].assets[] | select(.name | test("hub-linux-amd64-[0-9.]+.tgz")) | .browser_download_url')
@@ -30,7 +30,7 @@ update_files() {
     (set -x && perl -i -p0e "s/(opensuse.*- )\\Q$old_version\\E/\${1}$new_version/ms" meta/main.yml)
 
     (set -x && find . -name 'molecule.yml' -exec \
-        perl -i -pe "s|opensuse:\\Q$old_version\\E|opensuse/leap:$new_version|" {} \;)
+        perl -i -pe "s|opensuse/leap:\\Q$old_version\\E|opensuse/leap:$new_version|" {} \;)
 
     (set -x && perl -i -pe "s/OpenSUSE/openSUSE/i" README.md)
 
